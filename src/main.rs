@@ -1,16 +1,14 @@
 mod modules;
 
 use raylib::prelude::*;
-use modules::window_handler::*;
+use modules::window_setting_override::*;
+use modules::custom_functions::*;
 
 
 fn main() {
-    let (width,height) = get_screen_dimensions();
-
-
-
+  
     let (mut main_window_handle, thread) = raylib::init()
-        .size(width,height)
+        .size(get_screen_dimensions().0,get_screen_dimensions().1)
         .title("Transparent Undecorated Window")
         .undecorated()
         .transparent()
@@ -21,9 +19,9 @@ fn main() {
         .unfocused()
         .build();
 
-    let hwnd = get_hwnd(&mut main_window_handle);
     
-    hide_taskbar_icon(hwnd);
+    
+    hide_taskbar_icon(&mut main_window_handle);
 
 
     while !main_window_handle.window_should_close() {
