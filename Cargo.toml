@@ -1,0 +1,8 @@
+[package]
+name = "deskstead"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+raylib = { path = "F:/Rust/projects/Deskstead/localgit/deskstead-raylib" }
+winapi = { version = "0.3.9", features = ["winuser"] }
