@@ -1,43 +1,34 @@
 mod modules;
 
 use raylib::prelude::*;
-use modules::window_setting_override::*;
 use modules::custom_functions::*;
-
+use modules::init::initialize_window;
+use modules::objects::base::GameObject;
+use modules::objects::textured::TexturedObject;
 
 fn main() {
-  
-    let (mut main_window_handle, thread) = raylib::init()
-        .size(get_screen_dimensions().0,get_screen_dimensions().1)
-        .title("Transparent Undecorated Window")
-        .undecorated()
-        .transparent()
-        .click_through()
-        .always_top()
-        .vsync()
-        .msaa_4x()
-        .unfocused()
-        .build();
-
     
-    
-    hide_taskbar_icon(&mut main_window_handle);
+    let window_init = initialize_window();
+    let mut main_window = window_init.0;
+    let main_thread = window_init.1;
 
+    let exit_flag = 0;
 
-    while !main_window_handle.window_should_close() {
-        let mut main_window_thread =  main_window_handle.begin_drawing(&thread);
+    let mut logo_object = TexturedObject::new(&mut main_window, &main_thread, "assets/logo.png", 500.0, 500.0, 0.1, 1.0);
 
+    while exit_flag != 1 {
+        
+        let mut draw_handler = main_window.begin_drawing(&main_thread);
 
-        main_window_thread.clear_background(Color::BLANK);
-
-        // Get the global cursor position
+        draw_handler.clear_background(Color::BLANK);
+       
         let cursor_pos = get_global_mouse_position();
+        draw_handler.draw_circle(cursor_pos.0, cursor_pos.1, 60.0f32, Color::new(10, 0, 0, 100));
 
-        // Draw a circle at the cursor position
-        main_window_thread.draw_circle(cursor_pos.0, cursor_pos.1, 20.0f32, Color::GREEN);
+        logo_object.draw(&mut draw_handler);
+        logo_object.set_rotation(logo_object.get_rotation() + 1.0);
+
+        
     }
 
-
 }
-
-
