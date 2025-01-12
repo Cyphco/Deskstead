@@ -342,9 +342,9 @@ dependencies = [
 
 [[package]]
 name = "prettyplease"
-version = "0.2.27"
+version = "0.2.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "483f8c21f64f3ea09fe0f30f5d48c3e8eefe5dac9129f0075f76593b4c1da705"
+checksum = "924b9a625d6df5b74b0b3cfbb5669b3f62ddf3d46a677ce12b1945471b4ae5c3"
 dependencies = [
  "proc-macro2",
  "syn 2.0.96",
@@ -401,7 +401,7 @@ dependencies = [
 [[package]]
 name = "raylib"
 version = "5.0.1"
-source = "git+https://github.com/Cyphco/raylib-rs#0008d6cb076d2fe6af8bf160e7710c140f5766f6"
+source = "git+https://github.com/Cyphco/raylib-rs#48450c80f4248f2d0f3bedfd4077396b991dd6ce"
 dependencies = [
  "cfg-if 1.0.0",
  "lazy_static",
@@ -415,7 +415,7 @@ dependencies = [
 [[package]]
 name = "raylib-sys"
 version = "5.0.1"
-source = "git+https://github.com/Cyphco/raylib-rs#0008d6cb076d2fe6af8bf160e7710c140f5766f6"
+source = "git+https://github.com/Cyphco/raylib-rs#48450c80f4248f2d0f3bedfd4077396b991dd6ce"
 dependencies = [
  "bindgen",
  "cc",

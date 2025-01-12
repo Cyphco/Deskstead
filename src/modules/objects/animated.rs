@@ -1,93 +1,107 @@
 use raylib::prelude::*;
 use super::base::GameObject;
-use std::time::{Duration, Instant};
 
 pub struct AnimatedObject {
-    frames: Vec<Texture2D>,
-    current_frame: usize,
-    frame_duration: Duration,
-    last_frame_time: Instant,
+    texture: &'static Texture2D,
     position: Vector2,
     rotation: f32,
-    scale: f32,
-    is_playing: bool,
-    loop_animation: bool,
+    size: Vector2,
+    frame_width: i32,
+    frame_height: i32,
+    current_frame: i32,
+    frames_counter: i32,
+    frames_speed: i32,
+    max_frames: i32,
+    playing: bool,
+    looping: bool,
 }
 
 impl AnimatedObject {
     pub fn new(
-        window: &mut RaylibHandle,
-        thread: &RaylibThread,
-        frame_paths: Vec<&str>,
-        frame_duration_ms: u64,
-        x: f32,
-        y: f32,
-        rotation: f32,
-        scale: f32,
+        texture: &'static Texture2D,
+        position: Vector2,
+        size: Vector2,
+        frame_width: i32,
+        frame_height: i32,
+        frames_speed: i32,
+        max_frames: i32,
     ) -> Self {
-        let frames = frame_paths
-            .iter()
-            .map(|path| window.load_texture(thread, path).expect("Couldn't load texture"))
-            .collect();
-
         Self {
-            frames,
+            texture,
+            position,
+            rotation: 0.0,
+            size,
+            frame_width,
+            frame_height,
             current_frame: 0,
-            frame_duration: Duration::from_millis(frame_duration_ms),
-            last_frame_time: Instant::now(),
-            position: Vector2::new(x, y),
-            rotation,
-            scale,
-            is_playing: true,
-            loop_animation: true,
+            frames_counter: 0,
+            frames_speed,
+            max_frames,
+            playing: false,
+            looping: false,
         }
     }
 
     pub fn play(&mut self) {
-        self.is_playing = true;
+        self.playing = true;
     }
 
     pub fn pause(&mut self) {
-        self.is_playing = false;
+        self.playing = false;
     }
 
     pub fn set_looping(&mut self, loop_animation: bool) {
-        self.loop_animation = loop_animation;
+        self.looping = loop_animation;
     }
 
     pub fn reset(&mut self) {
         self.current_frame = 0;
-        self.last_frame_time = Instant::now();
-    }
-
-    fn update_animation(&mut self) {
-        if !self.is_playing || self.frames.is_empty() {
-            return;
-        }
-
-        let now = Instant::now();
-        if now.duration_since(self.last_frame_time) >= self.frame_duration {
-            self.current_frame = (self.current_frame + 1) % self.frames.len();
-            if !self.loop_animation && self.current_frame == 0 {
-                self.is_playing = false;
-                self.current_frame = self.frames.len() - 1;
-            }
-            self.last_frame_time = now;
-        }
+        self.frames_counter = 0;
     }
 }
 
 impl GameObject for AnimatedObject {
-    fn draw(&self, draw_handle: &mut RaylibDrawHandle) {
-        if let Some(current_texture) = self.frames.get(self.current_frame) {
-            draw_handle.draw_texture_ex(
-                current_texture,
-                self.position,
-                self.rotation,
-                self.scale,
-                Color::WHITE,
-            );
+    fn update(&mut self, dt: f32) {
+        if !self.playing {
+            return;
         }
+
+        self.frames_counter += 1;
+
+        if self.frames_counter >= self.frames_speed {
+            self.frames_counter = 0;
+            self.current_frame += 1;
+
+            if self.current_frame >= self.max_frames {
+                if self.looping {
+                    self.current_frame = 0;
+                } else {
+                    self.current_frame = self.max_frames - 1;
+                    self.playing = false;
+                }
+            }
+        }
+    }
+
+    fn draw(&self, d: &mut RaylibDrawHandle) {
+        d.draw_texture_pro(
+            self.texture,
+            Rectangle::new(
+                self.current_frame as f32 * self.frame_width as f32,
+                0.0,
+                self.frame_width as f32,
+                self.frame_height as f32,
+            ),
+            Rectangle::new(
+                self.position.x,
+                self.position.y,
+                self.size.x,
+                self.size.y,
+            ),
+            Vector2::new(self.size.x / 2.0, self.size.y / 2.0),
+            self.rotation,
+            Color::WHITE,
+        );
     }
 
     fn get_position(&self) -> Vector2 {
@@ -106,15 +120,7 @@ impl GameObject for AnimatedObject {
         self.rotation = rotation;
     }
 
-    fn get_scale(&self) -> f32 {
-        self.scale
-    }
-
-    fn set_scale(&mut self, scale: f32) {
-        self.scale = scale;
-    }
-
-    fn update(&mut self) {
-        self.update_animation();
+    fn get_size(&self) -> Vector2 {
+        self.size
     }
 }

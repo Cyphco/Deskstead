@@ -5,28 +5,37 @@ pub struct TexturedObject {
     texture: Texture2D,
     position: Vector2,
     rotation: f32,
-    scale: f32,
+    size: Vector2,
 }
 
 impl TexturedObject {
-    pub fn new(window: &mut RaylibHandle, thread: &RaylibThread, texture_path: &str, x: f32, y: f32, rotation: f32, scale: f32) -> Self {
-        let texture = window.load_texture(thread, texture_path).expect("Couldn't load texture");
+    pub fn new(
+        texture: Texture2D,
+        position: Vector2,
+        size: Vector2,
+        rotation: f32,
+    ) -> Self {
         Self {
             texture,
-            position: Vector2::new(x, y),
+            position,
             rotation,
-            scale,
+            size,
         }
     }
 }
 
 impl GameObject for TexturedObject {
-    fn draw(&self, draw_handle: &mut RaylibDrawHandle) {
-        draw_handle.draw_texture_ex(
+    fn update(&mut self, _dt: f32) {
+        // No update behavior needed for static textured objects
+    }
+
+    fn draw(&self, d: &mut RaylibDrawHandle) {
+        d.draw_texture_pro(
             &self.texture,
-            self.position,
+            Rectangle::new(0.0, 0.0, self.texture.width() as f32, self.texture.height() as f32),
+            Rectangle::new(self.position.x, self.position.y, self.size.x, self.size.y),
+            Vector2::new(self.size.x / 2.0, self.size.y / 2.0),
             self.rotation,
-            self.scale,
             Color::WHITE,
         );
     }
@@ -47,15 +56,7 @@ impl GameObject for TexturedObject {
         self.rotation = rotation;
     }
 
-    fn get_scale(&self) -> f32 {
-        self.scale
-    }
-
-    fn set_scale(&mut self, scale: f32) {
-        self.scale = scale;
-    }
-
-    fn update(&mut self) {
-        // Add any update logic here
+    fn get_size(&self) -> Vector2 {
+        self.size
     }
 }

@@ -1,68 +1,72 @@
-# Instructions for the object system
+# Objects Module Documentation
 
-## Particle.rs
-The Particle System is designed to create and manage particles in a graphical application. This guide provides detailed usage instructions for the `particle.rs` module.
-<details>
-<summary>Click to expand</summary>
+## Overview
+The objects module provides a flexible and extensible system for creating and managing game objects in the Deskstead engine. It includes support for basic objects, textured objects, animated objects, particles, and physics-enabled objects.
 
-## Particle System Configuration
+## Core Components
 
-### Parameters
-1. **Texture**: The texture used for the particles.
-   - **Type**: `Texture`
-   - **Usage**: `.texture(your_texture)`
+### GameObject (base.rs)
+The foundation trait that all game objects must implement. Provides basic functionality for:
+- Update logic
+- Drawing
+- Position management
+- Rotation handling
 
-2. **Scale**: The scale of the particles.
-   - **Type**: `f32`
-   - **Usage**: `.scale(0.1)` (default is `1.0`)
+### TexturedObject (textured.rs)
+Extends the base GameObject with texture rendering capabilities:
+- Texture loading and management
+- Scale and size control
+- Texture drawing with position and rotation
 
-3. **Emission Rate**: The rate at which particles are emitted.
-   - **Type**: `f32`
-   - **Usage**: `.emission_rate(1.0)`
+### AnimatedObject (animated.rs)
+Provides support for sprite-based animations:
+- Frame-based animation system
+- Multiple animation states
+- Animation speed control
+- Automatic frame updates
 
-4. **Position**: The initial position of the particles.
-   - **Type**: `Vector2`
-   - **Usage**: `.position(Vector2::new(x, y))`
+### ParticleSystem (particle.rs)
+A comprehensive particle system for special effects:
+- Particle emission control
+- Lifetime management
+- Movement patterns
+- Color and size transitions
 
-5. **Gravity**: The gravity vector affecting the particles.
-   - **Type**: `Vector2`
-   - **Usage**: `.gravity(Vector2::new(0.0, -9.81))`
+### PhysicsObject (physics_object.rs)
+A wrapper that adds physics capabilities to any GameObject:
+- Integration with the physics system
+- Collision detection and response
+- Mass and force handling
+- Position synchronization with physics simulation
 
-6. **Angle Range**: The range of angles for particle emission.
-   - **Type**: `Range<f32>`
-   - **Usage**: `.angle_range(0.0..45.0)`
+## Usage Examples
 
-7. **Rotation Speed**: The speed at which particles rotate.
-   - **Type**: `Range<f32>`
-   - **Usage**: `.rotation_speed(0.0..1.0)`
-
-8. **Initial Speed**: The initial speed of the particles.
-   - **Type**: `Range<f32>`
-   - **Usage**: `.initial_speed(0.0..1.0)`
-
-### Example Usage
+### Creating a Basic Object
 ```rust
-let mut particle_system = ParticleSystem::new()
-    .texture(your_texture)
-    .scale(0.1)
-    .emission_rate(1.0)
-    .position(Vector2::new(cursor_vec.x, cursor_vec.y))
-    .gravity(Vector2::new(0.0, 0.0))
-    .angle_range(0.0..45.0)
-    .rotation_speed(0.0..1.0)
-    .initial_speed(0.0..1.0)
-    .build();
+impl GameObject for MyObject {
+    fn update(&mut self, dt: f32) {
+        // Update logic
+    }
+    
+    fn draw(&self, draw_handle: &mut RaylibDrawHandle) {
+        // Drawing logic
+    }
+}
 ```
 
+### Adding Physics to an Object
+```rust
+let game_object = MyObject::new();
+let physics_object = PhysicsObject::new(
+    game_object,
+    Vector2::new(0.0, 0.0),  // position
+    Vector2::new(32.0, 32.0), // size
+    1.0,                      // mass
+    false                     // fixed
+);
+```
 
-
-### Emitting Particles
-The `emit_particle` function is responsible for creating new particles based on the configured settings. It samples the angle, speed, and rotation speed from the defined ranges and creates a new `Particle` object.
-
-### Important Notes
-- Ensure that the ranges for angle, rotation speed, and initial speed are valid to prevent runtime errors.
-- The particle system can be updated and drawn in your main loop to visualize the particles.
-
-## Conclusion
-This guide provides a comprehensive overview of how to use the particle system in your application. For further customization, refer to the source code and adjust parameters as needed.
-</details>
+## Integration Points
+- All objects can be wrapped with PhysicsObject for physics simulation
+- Particle systems can be attached to any GameObject
+- AnimatedObject can be combined with physics for dynamic game entities
